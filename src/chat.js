@@ -224,6 +224,7 @@ class Companion {
       text,
       name: input.senderName || '',
       source: channel,
+      hidden: /^（对方/.test(text) || /^（系统/.test(text),
     });
 
     // 「发张自拍」直接发人设自拍图，不让模型凭空生成别人的脸

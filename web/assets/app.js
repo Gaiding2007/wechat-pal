@@ -1,4 +1,4 @@
-﻿'use strict';
+'use strict';
 
 /**
  * 微信聊天伴侣 · 前端
@@ -442,6 +442,7 @@
     }
     S.lastDividerTs = 0;
     for (const m of S.session.messages) {
+      if (m.hidden) continue;
       maybeDivider(m.ts);
       if (m.role === 'user') appendUser(m.text);
       else {

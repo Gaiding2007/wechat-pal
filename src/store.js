@@ -164,7 +164,7 @@ class Store {
     this.markDirty();
   }
 
-  addMessage(id, { role, text, name = '', source = 'web', ts = nowIso(), images = [] }) {
+  addMessage(id, { role, text, name = '', source = 'web', ts = nowIso(), images = [], hidden = false }) {
     const session = this.get(id);
     if (!session) return null;
     const clean = String(text || '').trim();
@@ -177,6 +177,7 @@ class Store {
       source,
       ts,
       ...(Array.isArray(images) && images.length ? { images } : {}),
+      ...(hidden ? { hidden: true } : {}),
     };
     session.messages.push(message);
     if (session.messages.length > this.maxMessages) {

@@ -1,4 +1,4 @@
-﻿<p align="center">
+<p align="center">
   <a href="./README.md"><b>简体中文</b></a> ·
   <a href="./README.en.md">English</a>
 </p>
@@ -17,9 +17,9 @@
 ## 3.3 更新
 
 - **真正的安装包**：`wechat-pal-setup-3.3.1.exe`，双击安装，可自定义目录，装完桌面有快捷方式。不再需要解压 zip。
-- **角色立绘 / 自拍**：鲸鱼娘有了正式形象（`assets/persona/whale-girl.png`，蓝发鲸尾女仆装）。在聊天里说「发张自拍」「看看你长什么样」，她会发这张图，而不是随便生成一个陌生人。人设页可维护多张 `selfies`。
+- **角色立绘 / 自拍**：鲸鱼娘重新做了全身立绘（透明底，`assets/persona/whale-girl.png`）和 Q 版形象（`assets/persona/whale-girl-chibi-cutout.png`），网页图标、安装包图标、封面统一。在聊天里说「发张自拍」「看看你长什么样」，她会发自己的图，而不是随便生成一个陌生人。人设页可维护多张 `selfies`。
 - **表情包识别**：不再只靠表情名。会先截图聊天区做视觉识别；动图按 2fps 抽 3 帧逐帧描述再合并。识别结果缓存在 `data/sticker-desc.json`，第二次 0 秒。认不出时会诚实说「没看清」，不瞎编。
-- **介绍视频**：`dist/wechat-pal-intro.mp4`，约 55 秒，参考 lemo-opuscar 的 Dark Tech Keynote 风格（暗色舞台、荧光绿强调、UI 当主角），Edge TTS 晓伊配音，字幕跟旁白。封面 `dist/bilibili-cover.png`，投稿文案 `dist/bilibili.txt`，分镜见 `docs/B站视频故事板.md`。
+- **介绍视频**：`dist/wechat-pal-intro.mp4`，约 56 秒，lemo-opuscar 的 Dark Tech Keynote 风格（暗色舞台、荧光绿强调、UI 当主角），Edge TTS 晓伊配音，字幕跟旁白；人声出现时 BGM 自动压低。新增「自定义人格」和「微信里回文字/图片」演示。封面 `dist/bilibili-cover.png`，投稿文案 `dist/bilibili.txt`，分镜见 `docs/B站视频故事板.md`。
 - **图片发送**：确认过了，桥接本来就是「把文件放进剪贴板 → 在输入框 Ctrl+V → 发送」，不经过桌面。之前看到的路径只是临时文件。
 - **语音**：保持 3.2 的结论——微信内置转文字没有可编程入口；开源项目也是外部 DashScope ASR。设置里可填 Key，不填就回「没听清」。
 

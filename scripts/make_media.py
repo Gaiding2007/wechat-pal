@@ -43,13 +43,13 @@ def whale_block(size=720, rotate=0):
     return im
 
 def portrait(w, h, radius=28):
-    """把角色图等比放进 w×h 的圆角卡片，米白底。"""
-    im = Image.open(WHALE).convert('RGB')
-    scale = min((w - 12) / im.width, (h - 12) / im.height)
+    """把透明角色图等比放进 w×h 的圆角卡片，米白底。"""
+    im = Image.open(WHALE).convert('RGBA')
+    scale = min((w - 18) / im.width, (h - 18) / im.height)
     nw, nh = max(1, int(im.width * scale)), max(1, int(im.height * scale))
     im = im.resize((nw, nh), Image.LANCZOS)
-    card = Image.new('RGB', (w, h), (246, 242, 233))
-    card.paste(im, ((w - nw) // 2, (h - nh) // 2))
+    card = Image.new('RGBA', (w, h), (246, 242, 233, 255))
+    card.alpha_composite(im, ((w - nw) // 2, (h - nh) // 2))
     return rounded(card, radius)
 
 def background():
@@ -69,9 +69,9 @@ def intro(path):
     d.text((124, 540), '会聊天 · 会画画 · 有朋友圈', font=font(46, False), fill=MUTED + (255,))
     d.text((124, 630), '也有自己的生活和心情', font=font(46, False), fill=MUTED + (255,))
     d.text((124, 880), 'wechat-pal / 微信聊天伴侣', font=font(34, False), fill=(150, 175, 168, 255))
-    card_box = [1030, 120, 1810, 960]
+    card_box = [1130, 120, 1750, 960]
     shadow_card(base, card_box)
-    base.alpha_composite(portrait(780, 840), (1030, 120))
+    base.alpha_composite(portrait(620, 840), (1130, 120))
     d2 = ImageDraw.Draw(base)
     d2.rounded_rectangle(card_box, radius=28, outline=(124, 199, 180, 90), width=2)
     base.convert('RGB').save(path, quality=95)
@@ -125,17 +125,17 @@ def cover(path):
     d.ellipse([-150, ch - 260, 210, ch + 100], fill=(47, 107, 94, 100))
     d.text((64, 94), '我把鲸鱼娘', font=font(84), fill=(255, 255, 255, 255))
     d.text((64, 190), '养进了微信', font=font(92), fill=ACCENT + (255,))
-    d.text((66, 320), '会聊天 · 会画画 · 有朋友圈', font=font(32, False), fill=MUTED + (255,))
-    d.text((66, 372), '也有自己的生活和心情', font=font(32, False), fill=MUTED + (255,))
+    d.text((66, 320), '会聊天 · 会画画 · 换人格', font=font(32, False), fill=MUTED + (255,))
+    d.text((66, 372), '有朋友圈，也有自己的生活', font=font(32, False), fill=MUTED + (255,))
     d.text((66, 610), 'wechat-pal / 微信聊天伴侣', font=font(24, False), fill=(150, 175, 168, 255))
     # 右侧截图卡片
-    im = portrait(400, 500, radius=22)
-    box = [cw - 450, 90, cw - 50, 590]
+    im = portrait(380, 540, radius=22)
+    box = [cw - 440, 70, cw - 60, 650]
     shadow_card(base, box, radius=22, blur=24, alpha=120)
-    base.alpha_composite(im, (cw - 450, 90))
+    base.alpha_composite(im, (cw - 440, 70))
     d.rounded_rectangle(box, radius=22, outline=(124, 199, 180, 100), width=2)
-    labels = ['真实微信', '朋友圈', '会生图']
-    x = cw - 450
+    labels = ['真实微信', '朋友圈', '可换人格']
+    x = cw - 440
     for lb in labels:
         tw = d.textlength(lb, font=font(24, False))
         d.rounded_rectangle([x, 620, x + tw + 36, 668], radius=24, fill=(47, 107, 94, 180), outline=(124, 199, 180, 90), width=1)

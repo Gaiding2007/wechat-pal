@@ -206,9 +206,20 @@ raw_icon = Image.open(ROOT / "assets/persona/whale-girl-icon.png").convert("RGB"
 ICON = rounded_card(raw_icon, 104, radius=24)
 ICON_BIG = rounded_card(raw_icon, 320, radius=36)
 
-raw_portrait = Image.open(ROOT / "assets/persona/whale-girl.png").convert("RGB")
-PORTRAIT = with_shadow(rounded_card(raw_portrait, 430, radius=22))
-PORTRAIT_S = with_shadow(rounded_card(raw_portrait, 330, radius=18))
+raw_portrait = Image.open(ROOT / "assets/persona/whale-girl.png").convert("RGBA")
+
+
+def character_card(src: Image.Image, width: int, pad: int = 22) -> Image.Image:
+    im = src.copy()
+    scale = (width - pad * 2) / im.width
+    im = im.resize((max(1, int(im.width * scale)), max(1, int(im.height * scale))), Image.LANCZOS)
+    card = Image.new("RGBA", (width, im.height + pad * 2), (246, 242, 233, 255))
+    card.alpha_composite(im, (pad, pad))
+    return with_shadow(rounded_card(card, width, radius=22))
+
+
+PORTRAIT = character_card(raw_portrait, 430)
+PORTRAIT_S = character_card(raw_portrait, 330, pad=18)
 
 
 def shot(name, width, radius=16):
@@ -220,6 +231,9 @@ WECHAT = shot("02-wechat.png", 1120)
 MOMENTS = shot("03-moments.png", 900)
 LIFE = shot("05-life.png", 760)
 PERSONA = shot("06-persona.png", 860)
+CHAT_DEMO = with_shadow(rounded_card(Image.open(ROOT / "dist/video/chat-demo.png").convert("RGB"), 660, radius=26))
+PERSONA_RAW = Image.open(ROOT / "dist/video/shots/06-persona.png").convert("RGB").crop((680, 70, 1530, 930))
+PERSONA_CROP = with_shadow(rounded_card(PERSONA_RAW, 900, radius=20))
 INSTALL_CROP = Image.open(ROOT / "dist/video/bg-install.png").convert("RGB").crop((1040, 200, 1800, 840))
 INSTALL = with_shadow(rounded_card(INSTALL_CROP, 560, radius=12))
 
@@ -233,18 +247,18 @@ SCENES = [
     ),
     dict(
         key="chat",
-        voice="她叫 wechat-pal。会聊天，会画画，也会记住你随口说过的事。",
-        caption=["她叫 wechat-pal。", "会聊天，会画画，也会记住你随口说过的事。"],
+        voice="她叫 wechat-pal。你把微信交给她，她就会在聊天里回你。文字、图片，都可以。",
+        caption=["她叫 wechat-pal。", "你把微信交给她，她就会在聊天里回你。文字、图片，都可以。"],
+    ),
+    dict(
+        key="persona",
+        voice="不只是鲸鱼娘。你可以换一套人格，改她的名字、说话方式，甚至导入你自己写的人设。",
+        caption=["不只是鲸鱼娘。", "改名字、改说话方式，或者导入你自己写的人设。"],
     ),
     dict(
         key="install",
         voice="安装很简单。下载安装包，选个文件夹，双击，就好了。",
         caption=["安装很简单。", "下载安装包，选个文件夹，双击，就好了。"],
-    ),
-    dict(
-        key="wechat",
-        voice="登录微信，再打开桥接。她会自己找到你的微信，然后，在你的聊天列表里等你。",
-        caption=["登录微信，再打开桥接。", "她会自己找到你的微信，在你的聊天列表里等你。"],
     ),
     dict(
         key="moments",
@@ -258,8 +272,8 @@ SCENES = [
     ),
     dict(
         key="end",
-        voice="wechat-pal。把鲸鱼娘，养进微信。GitHub 搜 Gaiding2007。",
-        caption=["wechat-pal。", "把鲸鱼娘，养进微信。"],
+        voice="wechat-pal。把鲸鱼娘，养进微信。也可以换成，你自己的那个人。GitHub 搜 Gaiding2007。",
+        caption=["把鲸鱼娘，养进微信。", "也可以换成，你自己的那个人。"],
     ),
 ]
 
@@ -289,21 +303,21 @@ def prep_audio():
 
 def build_audio(total: float, starts):
     n = int(total * 44100) + 44100
-    master = np.zeros((n, 2), dtype=np.float32)
-    # soft pad
+    music = np.zeros((n, 2), dtype=np.float32)
+    voice = np.zeros((n, 2), dtype=np.float32)
     t = np.arange(n) / 44100
+    # soft pad
     chords = [(130.81, 164.81, 196.00), (110.00, 130.81, 164.81),
               (87.31, 130.81, 174.61), (98.00, 123.47, 146.83)]
     for k, ch in enumerate(chords * 8):
-        f0 = ch[0]
         seg = (t >= k * 4) & (t < (k + 1) * 4)
         if not seg.any():
             continue
         tt = t[seg] - k * 4
         env = np.minimum(1, tt / 1.8) * np.minimum(1, (4 - tt) / 1.4)
         for j, f in enumerate(ch):
-            master[seg] += (0.010 * env * np.sin(2 * np.pi * f * tt + j)).reshape(-1, 1)
-    # scene transition tick
+            music[seg] += (0.010 * env * np.sin(2 * np.pi * f * tt + j)).reshape(-1, 1)
+    # 场景转场 ping
     for st in starts:
         i0 = int(st * 44100)
         ln = int(0.09 * 44100)
@@ -311,17 +325,42 @@ def build_audio(total: float, starts):
             continue
         tt = np.arange(ln) / 44100
         ping = 0.045 * np.sin(2 * np.pi * 1760 * tt) * np.exp(-tt * 42)
-        master[i0:i0 + ln, 0] += ping
-        master[i0:i0 + ln, 1] += ping
-    # voices
+        music[i0:i0 + ln, 0] += ping
+        music[i0:i0 + ln, 1] += ping
+    # BGM
+    bgm_path = OUT / "bgm.wav"
+    if bgm_path.exists():
+        with wave.open(str(bgm_path), "rb") as w:
+            bd = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16).astype(np.float32) / 32768
+            bd = bd.reshape(-1, 2)
+        if bd.shape[0] < n:
+            bd = np.tile(bd, (n // bd.shape[0] + 1, 1))
+        music += bd[:n] * 0.26
+    # 旁白
     for s, st in zip(SCENES, starts):
         with wave.open(str(s["audio"]), "rb") as w:
-            sr = w.getframerate()
             data = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16).astype(np.float32) / 32768
-        data = data.reshape(-1, 2) if data.size % 2 == 0 else np.repeat(data[:, None], 2, axis=1)
+        data = data.reshape(-1, 2)
         i0 = int((st + 0.25) * 44100)
         ln = min(data.shape[0], n - i0)
-        master[i0:i0 + ln] += data[:ln] * 0.92
+        voice[i0:i0 + ln] += data[:ln] * 0.92
+    # 人声包络：有旁白时把 BGM 压到 26%，间隙回到 100%
+    block = 1024
+    nb = int(np.ceil(n / block))
+    env = np.zeros(nb)
+    mono = np.max(np.abs(voice), axis=1)
+    for b in range(nb):
+        env[b] = mono[b * block:(b + 1) * block].max() if b * block < n else 0
+    target = np.where(env > 0.015, 0.18, 0.85)
+    smooth = np.zeros(nb)
+    cur = 1.0
+    atk = 0.35
+    rel = 0.06
+    for b in range(nb):
+        cur += (target[b] - cur) * (atk if target[b] < cur else rel)
+        smooth[b] = cur
+    gain = np.interp(np.arange(n), np.arange(nb) * block, smooth)
+    master = music * gain[:, None] + voice
     master = np.clip(master, -1, 1)
     out = (master * 32767).astype(np.int16)
     with wave.open(str(OUT / "soundtrack.wav"), "wb") as w:
@@ -352,22 +391,39 @@ def scene_intro(im, p, t):
 
 def scene_chat(im, p, t):
     d = ImageDraw.Draw(im)
-    label(d, "01 / CONSOLE", (96, 84), ACCENT)
-    d.text((92, 140), "她不只是会聊天。", font=T_HEAD, fill=INK)
+    label(d, "01 / WECHAT", (96, 84), ACCENT)
+    d.text((92, 140), "她会在微信里回你。", font=T_HEAD, fill=INK)
     a = ease_out(fade(p, 0.05, 0.45))
-    paste_alpha(im, CHAT, (70 - (1 - a) * 70, 265), a)
-    items = [("会聊天", "流式回复、多气泡、记忆"), ("会画画", "生图后直接发到微信"), ("有朋友圈", "读动态、点赞、评论")]
-    for i, (h, s) in enumerate(items):
+    chat = CHAT_DEMO.resize((int(CHAT_DEMO.width * 0.98), int(CHAT_DEMO.height * 0.98)), Image.LANCZOS)
+    paste_alpha(im, chat, (80 - (1 - a) * 60, 240), a)
+    items = [("文字回复", "像朋友一样接话"), ("图片回复", "画完直接发到微信"), ("语音/表情", "收得到，也看得懂")]
+    for i, (h, s2) in enumerate(items):
         aa = ease_out(fade(p, 0.30 + i * 0.12, 0.55 + i * 0.12))
-        y = 300 + i * 150 + (1 - aa) * 24
-        d.ellipse([1210, y + 10, 1224, y + 24], fill=ACCENT + (int(255 * aa),))
-        d.text((1246, y), h, font=T_HEAD, fill=INK + (int(255 * aa),))
-        d.text((1246, y + 72), s, font=T_SMALL, fill=MUTED + (int(255 * aa),))
+        y = 330 + i * 150 + (1 - aa) * 24
+        d.ellipse([1240, y + 10, 1254, y + 24], fill=ACCENT + (int(255 * aa),))
+        d.text((1274, y), h, font=T_HEAD, fill=INK + (int(255 * aa),))
+        d.text((1274, y + 72), s2, font=T_SMALL, fill=MUTED + (int(255 * aa),))
+
+
+def scene_persona(im, p, t):
+    d = ImageDraw.Draw(im)
+    label(d, "02 / PERSONA", (96, 84), ACCENT)
+    d.text((92, 140), "不只是鲸鱼娘。", font=T_HEAD, fill=INK)
+    a = ease_out(fade(p, 0.05, 0.45))
+    paste_alpha(im, PERSONA_CROP, (40 - (1 - a) * 50, 250), a)
+    items = [("名字 / 外貌", "头像、配色、别名"), ("性格 / 说话方式", "提示词、口癖、边界"),
+             ("导入 / 导出", "两套预设，也能自己写")]
+    for i, (h, s2) in enumerate(items):
+        aa = ease_out(fade(p, 0.30 + i * 0.12, 0.55 + i * 0.12))
+        y = 330 + i * 150 + (1 - aa) * 24
+        d.ellipse([1240, y + 10, 1254, y + 24], fill=ACCENT + (int(255 * aa),))
+        d.text((1274, y), h, font=T_HEAD, fill=INK + (int(255 * aa),))
+        d.text((1274, y + 72), s2, font=T_SMALL, fill=MUTED + (int(255 * aa),))
 
 
 def scene_install(im, p, t):
     d = ImageDraw.Draw(im)
-    label(d, "02 / INSTALL", (96, 84), ACCENT)
+    label(d, "03 / INSTALL", (96, 84), ACCENT)
     d.text((92, 140), "装好，就能用。", font=T_HEAD, fill=INK)
     a = ease_out(fade(p, 0.04, 0.42))
     paste_alpha(im, INSTALL, (1080 - (1 - a) * 60, 300), a)
@@ -429,8 +485,8 @@ def scene_end(im, p, t):
     d.text((W // 2, 706), "MIT · 自带运行时 · 双击即用", font=T_SMALL, fill=MUTED, anchor="mm")
 
 
-SCENE_FN = dict(intro=scene_intro, chat=scene_chat, install=scene_install,
-                wechat=scene_wechat, moments=scene_moments, life=scene_life, end=scene_end)
+SCENE_FN = dict(intro=scene_intro, chat=scene_chat, persona=scene_persona, install=scene_install,
+                moments=scene_moments, life=scene_life, end=scene_end)
 
 
 # ------------------------------------------------------------- subtitles ----
