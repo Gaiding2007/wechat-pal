@@ -81,7 +81,7 @@ def end(path):
     d = ImageDraw.Draw(base)
     d.text((0, 250), 'wechat-pal', font=font(150), fill=(255, 255, 255, 255), anchor='ma')
     d.text((0, 450), '一个可以养在微信里的搭子', font=font(68), fill=ACCENT + (255,), anchor='ma')
-    d.text((0, 560), 'github.com/Gaiding1997/wechat-pal', font=font(40, False), fill=MUTED + (255,), anchor='ma')
+    d.text((0, 560), 'github.com/Gaiding2007/wechat-pal', font=font(40, False), fill=MUTED + (255,), anchor='ma')
     im = portrait(280, 340, radius=20)
     base.alpha_composite(im, ((W - 280) // 2, 640))
     base.convert('RGB').save(path, quality=95)

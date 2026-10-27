@@ -35,4 +35,4 @@
 - 朋友圈图片显示「图片未缓存」：先在微信里点开任意一张图看大图，停几秒，再回来点加载。
 - 表情包识别仍不准：新版会截图看画面，动图抽 3 帧；识别结果缓存在 data/sticker-desc.json，第二次会快很多。
 
-项目主页：https://github.com/Gaiding1997/wechat-pal
+项目主页：https://github.com/Gaiding2007/wechat-pal

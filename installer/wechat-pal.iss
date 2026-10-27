@@ -1,7 +1,7 @@
 ﻿#define AppName "微信聊天伴侣"
 #define AppVersion "3.3.1"
 #define AppPublisher "wechat-pal"
-#define AppURL "https://github.com/Gaiding1997/wechat-pal"
+#define AppURL "https://github.com/Gaiding2007/wechat-pal"
 
 [Setup]
 AppId={{8E4C3F2A-6B7D-4E19-9C2A-5D6F1B8E3A71}

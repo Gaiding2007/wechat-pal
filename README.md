@@ -46,7 +46,7 @@
 
 ## 快速开始
 
-从 [GitHub Releases](https://github.com/Gaiding1997/wechat-pal/releases) 下载 **`wechat-pal-setup-3.3.1.exe`**，双击安装（可以改安装目录），装完桌面会有「微信聊天伴侣」快捷方式。也可以直接双击 **`启动微信聊天伴侣.bat`**，浏览器会自动打开 <http://127.0.0.1:8787>。包内自带 Node，不需要另装。
+从 [GitHub Releases](https://github.com/Gaiding2007/wechat-pal/releases) 下载 **`wechat-pal-setup-3.3.1.exe`**，双击安装（可以改安装目录），装完桌面会有「微信聊天伴侣」快捷方式。也可以直接双击 **`启动微信聊天伴侣.bat`**，浏览器会自动打开 <http://127.0.0.1:8787>。包内自带 Node，不需要另装。
 
 也可以手动启动：
 
