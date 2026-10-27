@@ -1,0 +1,14 @@
+node_modules/
+data/
+runtime/
+dist/
+config.json
+*.log
+bridge/__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+.pytest_cache/
+wechatauto_db/
+wechatauto_logs/
+wechatauto_ocr_tmp.png

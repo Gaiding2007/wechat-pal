@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f6f4ef" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141614" media="(prefers-color-scheme: dark)">
+<title>编辑人设 · 微信聊天伴侣</title>
+<link rel="stylesheet" href="/assets/style.css">
+<link rel="stylesheet" href="/assets/persona.css">
+</head>
+<body class="persona-page">
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M14.5 5.5 8 12l6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<header class="topbar">
+  <a class="back" href="/" aria-label="返回聊天">
+    <svg class="ico" aria-hidden="true"><use href="#i-back"/></svg>
+    <span>返回聊天</span>
+  </a>
+  <div class="topbar-title">
+    <strong>编辑人设</strong>
+    <span id="dirtyTip"></span>
+  </div>
+  <div class="topbar-actions">
+    <button class="btn ghost small" id="btnImport" type="button">导入 JSON</button>
+    <input type="file" id="fileImport" accept="application/json,.json" hidden>
+    <button class="btn ghost small" id="btnExport" type="button">导出</button>
+    <button class="btn ghost small" id="btnReset" type="button">恢复预设</button>
+    <button class="btn small" id="btnSave" type="button">保存</button>
+  </div>
+</header>
+
+<div class="editor">
+  <aside class="editor-side">
+    <section class="panel">
+      <h2>预设</h2>
+      <p class="panel-note">整套替换，会覆盖当前修改。</p>
+      <div class="preset-list" id="presetList"></div>
+    </section>
+    <section class="panel preview-panel">
+      <h2>预览</h2>
+      <div class="preview">
+        <div class="preview-avatar" id="previewAvatar">鲸</div>
+        <strong id="previewName">鲸鱼娘</strong>
+        <span class="preview-tagline" id="previewTagline"></span>
+        <p class="preview-greeting" id="previewGreeting"></p>
+        <div class="preview-tags" id="previewTags"></div>
+      </div>
+      <p class="panel-note">保存后回聊天页生效。微信桥接用的是同一份人设。</p>
+    </section>
+  </aside>
+
+  <main class="editor-main">
+    <section class="panel">
+      <h2>基本</h2>
+      <div class="grid-2">
+        <div class="field">
+          <label for="pName">名字</label>
+          <input id="pName" type="text" maxlength="24" placeholder="出现在聊天顶栏和气泡里">
+        </div>
+        <div class="field short">
+          <label for="pAvatar">头像字</label>
+          <input id="pAvatar" type="text" maxlength="2" placeholder="一两个字">
+        </div>
+        <div class="field short">
+          <label for="pColor">头像颜色</label>
+          <div class="color-row">
+            <input id="pColor" type="color" value="#2f6fb3">
+            <input id="pColorText" type="text" maxlength="7" placeholder="#2f6fb3">
+          </div>
+        </div>
+        <div class="field">
+          <label for="pTagline">一句话介绍</label>
+          <input id="pTagline" type="text" maxlength="60" placeholder="比如：一条爱吃白饭的蓝色大肥鱼">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="pAge">年龄</label>
+          <input id="pAge" type="text" maxlength="40" placeholder="可以写「按 token 算刚成年」">
+        </div>
+        <div class="field">
+          <label for="pIdentity">身份 / 职业</label>
+          <input id="pIdentity" type="text" maxlength="120" placeholder="比如：自由插画师、贴吧老吧友">
+        </div>
+      </div>
+      <div class="field">
+        <label for="pAliases">别名（叫这些名字也算叫它）</label>
+        <div class="chips" id="pAliases"></div>
+      </div>
+      <div class="field">
+        <label for="pAppearance">外貌</label>
+        <textarea id="pAppearance" rows="3" maxlength="300" placeholder="头发、眼睛、穿着、随身物件……"></textarea>
+      </div>
+      <div class="field">
+        <label for="pSelfies">自拍图（每行一个路径）</label>
+        <textarea id="pSelfies" rows="2" placeholder="assets/persona/whale-girl.png"></textarea>
+        <p class="tip">用户说「发张自拍」时，会直接发这里的第一张图；相对路径按项目根目录算。</p>
+      </div>
+      <div class="field">
+        <label for="pBackground">经历 / 背景</label>
+        <textarea id="pBackground" rows="4" maxlength="800" placeholder="它从哪来、经历过什么、现在在做什么。"></textarea>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>性格与说话</h2>
+      <div class="field">
+        <label>性格标签</label>
+        <div class="chips" id="pPersonality"></div>
+        <span class="tip">比如：傲娇、天然呆、嘴硬心软。回车添加。</span>
+      </div>
+      <div class="field">
+        <label>说话习惯</label>
+        <div class="chips" id="pSpeaking"></div>
+        <span class="tip">一条一个规则，比如「短句」「叫对方鱼片」「爱说『唔』」。</span>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="pStyle">整体语气</label>
+          <select id="pStyle"></select>
+        </div>
+        <div class="field">
+          <label for="pEmoji">表情使用</label>
+          <select id="pEmoji">
+            <option value="0">完全不用</option>
+            <option value="1">很少，最多一个</option>
+            <option value="2">偶尔带一个</option>
+            <option value="3">可以多一点，但别刷屏</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="pStyleText">补充语气（会原样放进提示词）</label>
+        <textarea id="pStyleText" rows="2" maxlength="800" placeholder="比如：被夸会先嘴硬，再小声承认。"></textarea>
+      </div>
+      <div class="field">
+        <label>其它倾向</label>
+        <div class="switch-row compact">
+          <div><strong>有情绪</strong><span>会高兴、会烦，但不歇斯底里</span></div>
+          <label class="switch"><input type="checkbox" id="pEmotions"><span></span></label>
+        </div>
+        <div class="switch-row compact">
+          <div><strong>内心戏</strong><span>偶尔先写一句很短的心里话</span></div>
+          <label class="switch"><input type="checkbox" id="pProactive"><span></span></label>
+        </div>
+        <div class="switch-row compact">
+          <div><strong>有自己的看法</strong><span>可以直说喜欢或不喜欢</span></div>
+          <label class="switch"><input type="checkbox" id="pOpinions"><span></span></label>
+        </div>
+        <div class="switch-row compact">
+          <div><strong>看点链接</strong><span>对方发链接时先读一下再回</span></div>
+          <label class="switch"><input type="checkbox" id="pLinks"><span></span></label>
+        </div>
+      </div>
+      <div class="field">
+        <label>兴趣</label>
+        <div class="chips" id="pInterests"></div>
+      </div>
+      <div class="field">
+        <label>边界（它不会做的事）</label>
+        <div class="chips" id="pBoundaries"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>聊天节奏</h2>
+      <div class="grid-4">
+        <div class="field">
+          <label for="pPrivateMax">私聊字数</label>
+          <input id="pPrivateMax" type="number" min="40" max="300" step="10">
+        </div>
+        <div class="field">
+          <label for="pGroupMax">群聊字数</label>
+          <input id="pGroupMax" type="number" min="30" max="200" step="10">
+        </div>
+        <div class="field">
+          <label for="pBubbles">最多几条</label>
+          <input id="pBubbles" type="number" min="1" max="4" step="1">
+        </div>
+        <div class="field">
+          <label for="pHistory">记忆轮数</label>
+          <input id="pHistory" type="number" min="4" max="80" step="2">
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="field">
+          <label for="pGroupHistory">群聊记忆轮数</label>
+          <input id="pGroupHistory" type="number" min="2" max="60" step="2">
+        </div>
+        <div class="field">
+          <label for="pGreeting">开场白</label>
+          <input id="pGreeting" type="text" maxlength="80" placeholder="第一次打开聊天时显示">
+        </div>
+      </div>
+      <p class="tip">字数指整次回复的总字数，模型会自己拆成几条短消息。</p>
+    </section>
+
+    <section class="panel">
+      <h2>关系</h2>
+      <div class="switch-row">
+        <div>
+          <strong>有「主人」</strong>
+          <span>开启后，网页里你默认是主人；微信里按昵称或 wxid 认</span>
+        </div>
+        <label class="switch"><input type="checkbox" id="pMasterEnabled"><span></span></label>
+      </div>
+      <div class="grid-2" id="masterFields">
+        <div class="field">
+          <label for="pMasterTitle">称呼</label>
+          <input id="pMasterTitle" type="text" maxlength="12" placeholder="主人">
+        </div>
+        <div class="field">
+          <label for="pMasterNames">微信昵称（一行一个）</label>
+          <textarea id="pMasterNames" rows="2" placeholder="比如：小林"></textarea>
+        </div>
+      </div>
+      <div class="field" id="masterWxidField">
+        <label for="pMasterWxids">wxid（一行一个，最稳）</label>
+        <textarea id="pMasterWxids" rows="2" placeholder="wxid_xxxxxxxx"></textarea>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>补充</h2>
+      <div class="field">
+        <label for="pSystem">人设补充（优先级高）</label>
+        <textarea id="pSystem" rows="4" maxlength="2000" placeholder="任何希望它记住的设定，会写进系统提示词。"></textarea>
+      </div>
+      <div class="field">
+        <label for="pCustom">额外约定</label>
+        <textarea id="pCustom" rows="3" maxlength="1000" placeholder="比如：别主动提工作；晚上语气放轻。"></textarea>
+      </div>
+      <div class="field">
+        <label>快捷话题</label>
+        <div class="chips" id="pSuggestions"></div>
+      </div>
+      <p class="tip">安全边界（不骗人、不替你做重大决定、遇到危险建议求助）固定写在提示词里，不需要在这里重复。</p>
+    </section>
+
+    <div class="editor-foot">
+      <span id="saveState" class="tip"></span>
+      <button class="btn" id="btnSaveBottom" type="button">保存人设</button>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="/assets/persona.js"></script>
+</body>
+</html>

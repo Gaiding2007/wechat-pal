@@ -1,0 +1,142 @@
+{
+  "server": {
+    "host": "127.0.0.1",
+    "port": 8787,
+    "openBrowser": true
+  },
+  "llm": {
+    "provider": "deepseek",
+    "apiKey": "",
+    "baseUrl": "",
+    "model": "",
+    "temperature": 0.9,
+    "maxTokens": 700,
+    "timeoutMs": 45000
+  },
+  "persona": {
+    "id": "whale",
+    "name": "鲸鱼娘",
+    "userName": "",
+    "aliases": [
+      "鲸鱼娘",
+      "小鲸鱼",
+      "哦鲸鲸",
+      "大肥鱼"
+    ],
+    "customPrompt": ""
+  },
+  "chat": {
+    "privateMaxChars": 140,
+    "groupMaxChars": 70,
+    "maxBubbles": 3,
+    "historyTurns": 20,
+    "groupHistoryTurns": 12,
+    "groupRequireAt": true,
+    "groupFreeChat": false,
+    "groupFreeChatChance": 10,
+    "groupCooldownSec": 20,
+    "groupEngagedMinutes": 6,
+    "groupSilentMinutes": 20,
+    "groupMuteDefaultMinutes": 30,
+    "emojiLevel": "normal"
+  },
+  "group": {
+    "mutedGroups": []
+  },
+  "links": {
+    "enabled": true,
+    "maxLinks": 2
+  },
+  "websearch": {
+    "enabled": true,
+    "maxResults": 4
+  },
+  "memory": {
+    "autoExtract": true,
+    "everyMessages": 8,
+    "maxNotes": 8
+  },
+  "vision": {
+    "apiKey": "",
+    "baseUrl": "https://open.bigmodel.cn/api/paas/v4",
+    "model": "glm-4v-flash",
+    "timeoutMs": 30000,
+    "stickerScreenshot": false
+  },
+  "imagegen": {
+    "enabled": true,
+    "apiKey": "",
+    "baseUrl": "https://maas.qianwenaiapi.com",
+    "model": "qwen-image-3.0",
+    "timeoutMs": 180000
+  },
+  "care": {
+    "enabled": false,
+    "windows": [
+      "09:00-12:00",
+      "14:00-23:00"
+    ],
+    "everyMinutes": 180,
+    "jitterMinutes": 30,
+    "maxPerDay": 3,
+    "quietAfterMinutes": 20
+  },
+  "gateway": {
+    "wechat": {
+      "enabled": true,
+      "inboundToken": "change-me-wechat",
+      "outboundUrl": "",
+      "outboundHeaders": {}
+    }
+  },
+  "bridge": {
+    "rpcPort": 8791,
+    "token": ""
+  },
+  "tools": {
+    "ffmpegUrl": "",
+    "autoInstall": true
+  },
+  "wechat": {
+    "dbDir": "",
+    "staleAfterSec": 180,
+    "quoteReply": true,
+    "keyboardFallback": true,
+    "backgroundSend": false,
+    "gameWhitelist": [],
+    "awayNotice": true,
+    "returnNotice": true,
+    "queuedMaxAgeSec": 300,
+    "queuedMaxChats": 2,
+    "lowBatteryPercent": 5,
+    "digestMinutes": 30,
+    "ignoreSenders": [],
+    "goodnightText": "不早啦，早点睡，晚安。"
+  },
+  "voice": {
+    "enabled": false,
+    "apiKey": "",
+    "baseUrl": "",
+    "model": "qwen3-asr-flash",
+    "timeoutMs": 90000,
+    "maxSeconds": 120
+  },
+  "share": {
+    "enabled": false,
+    "everyMinutes": 120,
+    "sources": [
+      "bilibili"
+    ]
+  },
+  "admin": {
+    "spell": true,
+    "minutes": 10,
+    "allowAll": false
+  },
+  "debug": {
+    "allowAll": false
+  },
+  "log": {
+    "level": "info"
+  }
+}

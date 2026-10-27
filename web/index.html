@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F6F4EF" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141514" media="(prefers-color-scheme: dark)">
+<title>微信聊天伴侣</title>
+<link rel="icon" type="image/png" href="/persona-image/whale-girl-icon.png">
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<svg class="sprite" aria-hidden="true">
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><path d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M19.4 13.5a7.7 7.7 0 0 0 0-3l1.5-1.2-1.6-2.7-1.8.7a7.7 7.7 0 0 0-2.6-1.5L14.6 3h-3.2l-.3 2.8a7.7 7.7 0 0 0-2.6 1.5l-1.8-.7-1.6 2.7L6.6 10.5a7.7 7.7 0 0 0 0 3l-1.5 1.2 1.6 2.7 1.8-.7a7.7 7.7 0 0 0 2.6 1.5l.3 2.8h3.2l.3-2.8a7.7 7.7 0 0 0 2.6-1.5l1.8.7 1.6-2.7-1.4-1.2Z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M7 7l1 12h8l1-12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3.5c.6 4.2 2 5.6 6.2 6.2-4.2.6-5.6 2-6.2 6.2-.6-4.2-2-5.6-6.2-6.2 4.2-.6 5.6-2 6.2-6.2Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M18 16.5c.3 2 1 2.7 3 3-2 .3-2.7 1-3 3-.3-2-1-2.7-3-3 2-.3 2.7-1 3-3Z" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="10" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M15 6.5V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+</svg>
+
+<div class="app" id="app">
+  <aside class="side" id="side">
+    <div class="side-head">
+      <div class="logo" aria-hidden="true">
+        <img src="/persona-image/whale-girl-icon.png" alt="">
+      </div>
+      <div class="brand">
+        <strong>微信聊天伴侣</strong>
+        <span>和一个人，慢慢聊</span>
+      </div>
+    </div>
+
+    <nav class="app-nav" id="appNav" aria-label="功能">
+      <button class="nav-item is-active" data-view="chat"><span class="nav-dot"></span>聊天</button>
+      <button class="nav-item" data-view="wechat"><span class="nav-dot"></span>微信消息</button>
+      <button class="nav-item" data-view="moments"><span class="nav-dot"></span>朋友圈</button>
+      <button class="nav-item" data-view="stickers"><span class="nav-dot"></span>表情</button>
+      <button class="nav-item" data-view="life"><span class="nav-dot"></span>生活</button>
+      <a class="nav-item" href="/persona"><span class="nav-dot"></span>人设</a>
+    </nav>
+
+    <button class="new-chat" id="btnNew">
+      <svg class="ico" aria-hidden="true"><use href="#i-plus"/></svg>
+      新对话
+    </button>
+
+    <div class="list" id="sessionList" role="list"></div>
+
+    <div class="side-foot">
+      <button class="foot-btn" id="btnSettings">
+        <svg class="ico" aria-hidden="true"><use href="#i-gear"/></svg>
+        设置
+      </button>
+      <span class="mode" id="modeBadge">演示模式</span>
+    </div>
+  </aside>
+
+  <div class="scrim" id="scrim"></div>
+
+  <main class="chat">
+    <section class="view view-chat" id="view-chat">
+    <header class="chat-head">
+      <button class="icon-btn only-mobile" id="btnSide" aria-label="对话列表">
+        <svg class="ico" aria-hidden="true"><use href="#i-menu"/></svg>
+      </button>
+      <div class="who">
+        <span class="avatar" id="peerAvatar">鲸</span>
+        <div class="who-text">
+          <h1 id="peerName">鲸鱼娘</h1>
+          <p><span class="dot" id="peerDot"></span><span id="peerStatus">连接中</span></p>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="text-btn" id="btnMemory">记忆</button>
+        <button class="text-btn" id="btnClear">清空</button>
+        <button class="text-btn" id="btnSettings2">设置</button>
+      </div>
+    </header>
+
+    <div class="banner" id="banner" hidden>
+      <div>
+        <strong>演示模式</strong>
+        <span id="bannerText">还没有连接模型，先用固定的几句话把流程走通。配置 API Key 后就会真的聊起来。</span>
+      </div>
+      <button class="banner-btn" id="bannerBtn">去配置</button>
+    </div>
+
+    <div class="stream" id="stream">
+      <div class="thread" id="thread"></div>
+    </div>
+
+    <div class="composer">
+      <div class="composer-box">
+        <textarea id="input" rows="1" placeholder="说点什么…" aria-label="输入消息"></textarea>
+        <button class="send" id="btnSend" aria-label="发送" disabled>
+          <svg class="ico" aria-hidden="true"><use href="#i-send"/></svg>
+        </button>
+      </div>
+      <p class="hint"><span class="desktop-only">Enter 发送 · Shift + Enter 换行 · </span>想让它记住，就说「记住：…」</p>
+    </div>
+    </section>
+
+    <section class="view" id="view-wechat" hidden>
+      <header class="page-head">
+        <div>
+          <h1>微信</h1>
+          <p id="wxHeadStatus"><span class="dot"></span>正在连接桥接…</p>
+        </div>
+        <div class="page-actions">
+          <button class="text-btn" id="wxRefresh">刷新</button>
+          <button class="text-btn" id="wxSettings">设置</button>
+        </div>
+      </header>
+      <div class="wx-layout">
+        <div class="wx-side">
+          <div class="wx-side-head">
+            <input id="wxSearch" class="wx-search" placeholder="搜索会话">
+          </div>
+          <div class="wx-list" id="wxList"></div>
+        </div>
+        <div class="wx-main" id="wxMain">
+          <div class="empty-state" id="wxEmpty">
+            <strong>左边选一个会话</strong>
+            <span>这里显示的是微信里的真实聊天记录，能看图、听语音、收文件。</span>
+          </div>
+          <div class="wx-thread-wrap" id="wxThreadWrap" hidden>
+            <header class="wx-thread-head">
+              <div>
+                <h2 id="wxPeer">会话</h2>
+                <p id="wxPeerSub">微信</p>
+              </div>
+              <div class="page-actions">
+                <button class="text-btn" id="wxEmoji">表情</button>
+                <button class="text-btn" id="wxImage">图片</button>
+                <button class="text-btn" id="wxFile">文件</button>
+              </div>
+            </header>
+            <div class="wx-thread" id="wxThread"></div>
+            <div class="composer wx-composer">
+              <div class="composer-box">
+                <textarea id="wxInput" rows="1" placeholder="以你的身份发一条微信…" aria-label="发送微信消息"></textarea>
+                <button class="send" id="wxSend" aria-label="发送" disabled>
+                  <svg class="ico" aria-hidden="true"><use href="#i-send"/></svg>
+                </button>
+              </div>
+              <p class="hint">这里发送会用你自己的微信号直接发出；AI 自动回复仍由桥接在后台处理。</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-moments" hidden>
+      <header class="page-head">
+        <div>
+          <h1>朋友圈</h1>
+          <p id="momentsSub">读得到、能点赞和评论；发布还在实验里。</p>
+        </div>
+        <div class="page-actions">
+          <button class="text-btn" id="momentsRefresh">刷新</button>
+          <button class="text-btn" id="momentsCompose">发一条</button>
+        </div>
+      </header>
+      <div class="moments-wrap">
+        <div class="moments-feed" id="momentsFeed"></div>
+      </div>
+    </section>
+
+    <section class="view" id="view-stickers" hidden>
+      <header class="page-head">
+        <div>
+          <h1>表情</h1>
+          <p>从微信缓存里收集的表情，和自己传进来的图。点一下就能发到当前微信会话。</p>
+        </div>
+        <div class="page-actions">
+          <button class="text-btn" id="stickerGen">生成图片</button>
+          <button class="text-btn" id="stickerUpload">上传图片</button>
+          <button class="text-btn" id="stickerRefresh">刷新</button>
+        </div>
+      </header>
+      <div class="stickers-wrap">
+        <div class="sticker-section" id="genSection" hidden>
+          <h2>刚生成的图</h2>
+          <div class="sticker-grid" id="genResult"></div>
+        </div>
+        <div class="sticker-section">
+          <h2>微信表情缓存</h2>
+          <div class="sticker-grid" id="stickerCache"></div>
+        </div>
+        <div class="sticker-section">
+          <h2>我的表情</h2>
+          <div class="sticker-grid" id="stickerMine"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="view-life" hidden>
+      <header class="page-head">
+        <div>
+          <h1>生活</h1>
+          <p>她自己的状态：心情、精力、今天想做的事。</p>
+        </div>
+        <div class="page-actions">
+          <button class="text-btn" id="lifeRefresh">刷新</button>
+        </div>
+      </header>
+      <div class="life-wrap" id="lifeWrap"></div>
+    </section>
+  </main>
+</div>
+
+<nav class="tabbar" id="tabbar" aria-label="主导航">
+  <button type="button" data-view="chat" class="on">聊天</button>
+  <button type="button" data-view="wechat">微信</button>
+  <button type="button" data-view="moments">朋友圈</button>
+  <button type="button" data-view="stickers">表情</button>
+  <button type="button" data-view="life">生活</button>
+</nav>
+
+<aside class="drawer" id="drawer" aria-label="设置" aria-hidden="true">
+  <div class="drawer-head">
+    <h2 id="drawerTitle">设置</h2>
+    <button class="icon-btn" id="btnCloseDrawer" aria-label="关闭">
+      <svg class="ico" aria-hidden="true"><use href="#i-close"/></svg>
+    </button>
+  </div>
+  <div class="drawer-body" id="drawerBody">
+
+    <section class="sec" data-sec="model">
+      <h3>模型服务</h3>
+      <p class="sec-note">所有服务都走 OpenAI 兼容接口。没有 Key 时会先用演示回复。</p>
+      <div class="field">
+        <label for="fProvider">服务商</label>
+        <select id="fProvider"></select>
+        <span class="tip" id="providerHint"></span>
+      </div>
+      <div class="field">
+        <label for="fKey">API Key</label>
+        <input id="fKey" type="password" autocomplete="off" placeholder="粘贴你的 API Key">
+        <span class="tip" id="keyTip"></span>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="fBase">Base URL</label>
+          <input id="fBase" type="text" spellcheck="false" placeholder="https://…">
+        </div>
+        <div class="field">
+          <label for="fModel">模型</label>
+          <input id="fModel" type="text" spellcheck="false" list="modelList" placeholder="deepseek-chat">
+          <datalist id="modelList"></datalist>
+        </div>
+      </div>
+      <div class="field">
+        <label for="fTemp">温度 <span class="val" id="tempVal">0.9</span></label>
+        <input id="fTemp" type="range" min="0" max="1.5" step="0.05" value="0.9">
+        <span class="tip">高一点更活泼，低一点更稳。0.8–1.0 比较像日常聊天。</span>
+      </div>
+    </section>
+
+    <section class="sec" data-sec="chat">
+      <h3>聊天</h3>
+      <div class="field">
+        <label for="fUserName">它怎么称呼你</label>
+        <input id="fUserName" type="text" maxlength="20" placeholder="比如：小林">
+      </div>
+      <div class="field">
+        <div class="field-head">
+          <label>人设</label>
+          <a class="text-link" href="/persona" id="btnEditPersona">编辑全部设定 →</a>
+        </div>
+        <div class="persona-list" id="personaList"></div>
+      </div>
+      <div class="field">
+        <label for="fEmoji">表情符号 / 颜文字频率</label>
+        <select id="fEmoji">
+          <option value="low">少一点，几乎不用</option>
+          <option value="normal">自然，偶尔用</option>
+          <option value="high">多一点，爱用颜文字</option>
+        </select>
+        <span class="tip">只影响聊天里的表情习惯，不改变人设本身。</span>
+      </div>
+      <details class="details">
+        <summary>群聊规则</summary>
+        <div class="switch-row compact">
+          <div>
+            <strong>被 @ 才回</strong>
+            <span>群里没叫到就安静待着</span>
+          </div>
+          <label class="switch"><input type="checkbox" id="fRequireAt"><span></span></label>
+        </div>
+        <div class="switch-row compact">
+          <div>
+            <strong>允许自由接话</strong>
+            <span>没人叫也可能插一句，按下面的概率</span>
+          </div>
+          <label class="switch"><input type="checkbox" id="fFreeChat"><span></span></label>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="fChance">接话概率（%）</label>
+            <input id="fChance" type="number" min="0" max="100" step="1">
+          </div>
+          <div class="field">
+            <label for="fCooldown">群内冷却（秒）</label>
+            <input id="fCooldown" type="number" min="0" max="600" step="5">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="fEngaged">聊起来后持续（分钟）</label>
+            <input id="fEngaged" type="number" min="0" max="240" step="1">
+          </div>
+          <div class="field">
+            <label for="fSilent">多久没说话算离开（分钟）</label>
+            <input id="fSilent" type="number" min="0" max="1440" step="5">
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="fMute">被冷落后的默认禁言（分钟）</label>
+            <input id="fMute" type="number" min="0" max="1440" step="5">
+          </div>
+          <div class="field">
+            <label for="fMuted">不回复的群（chatroom id）</label>
+            <textarea id="fMuted" rows="2" placeholder="多个用逗号或换行分隔，比如 123@chatroom"></textarea>
+          </div>
+        </div>
+      </details>
+      <details class="details">
+        <summary>自定义补充（进阶）</summary>
+        <div class="field" style="margin-top:12px">
+          <label for="fCustom">附加在人设后面的约定</label>
+          <textarea id="fCustom" rows="4" placeholder="比如：多问问我的工作进展；不要提猫。"></textarea>
+          <span class="tip">想改性格、外貌、说话方式，点上面的「编辑全部设定」。</span>
+        </div>
+      </details>
+    </section>
+
+    <section class="sec" data-sec="wechat">
+      <h3>微信</h3>
+      <div class="bridge-line">
+        <span class="status-dot" id="bridgeDot"></span>
+        <span id="bridgeState">未连接</span>
+      </div>
+      <p class="sec-note" id="bridgeHint">网页是测试台；想真的在微信里聊，需要在登录微信的这台 Windows 上再跑一个桥接脚本。</p>
+      <div class="switch-row">
+        <div>
+          <strong>启用网关</strong>
+          <span>允许本机桥接把消息发进来</span>
+        </div>
+        <label class="switch"><input type="checkbox" id="fBridge"><span></span></label>
+      </div>
+      <div class="switch-row">
+        <div>
+          <strong>主动搭话</strong>
+          <span>隔一段时间先问候一句（默认关闭）</span>
+        </div>
+        <label class="switch"><input type="checkbox" id="fCare"><span></span></label>
+      </div>
+      <div class="switch-row">
+        <div>
+          <strong>看点链接</strong>
+          <span>对方发链接时，先看一眼再回</span>
+        </div>
+        <label class="switch"><input type="checkbox" id="fLinks"><span></span></label>
+      </div>
+      <div class="switch-row">
+        <div>
+          <strong>主动分享</strong>
+          <span>偶尔从 B 站挑个视频发过来（默认关闭）</span>
+        </div>
+        <label class="switch"><input type="checkbox" id="fShare"><span></span></label>
+      </div>
+      <div class="token-row">
+        <code id="bridgeToken">change-me-wechat</code>
+        <button class="icon-btn small" id="btnCopyToken" aria-label="复制令牌">
+          <svg class="ico" aria-hidden="true"><use href="#i-copy"/></svg>
+        </button>
+      </div>
+      <p class="tip">把 config.json 里 gateway.wechat.inboundToken 改成别的值更安全。</p>
+      <div class="field" style="margin-top:14px">
+        <label for="fDbDir">微信数据库目录（自动找不到时填）</label>
+        <input id="fDbDir" type="text" spellcheck="false" placeholder="例如 D:\applications\微信聊天\xwechat_files">
+        <span class="tip">微信 → 左下角三条杠 → 设置 → 文件管理 →「微信文件默认保存位置」。填到 xwechat_files 这一层，不要填里面的 wxid_xxx。留空则每次自动找。</span>
+      </div>
+      <div class="ffmpeg-row" id="ffmpegRow">
+        <div>
+          <strong>图片转码 ffmpeg</strong>
+          <span id="ffmpegState">检查中…</span>
+        </div>
+        <button class="btn small" id="btnInstallFfmpeg" type="button">安装</button>
+      </div>
+      <div class="field" style="margin-top:14px">
+        <label for="fVisionKey">看图 Key（可选）</label>
+        <input id="fVisionKey" type="password" autocomplete="off" placeholder="智谱 API Key，用于识别微信里的图片">
+        <span class="tip" id="visionKeyTip">不填也能聊，只是看不了图片。</span>
+      </div>
+      <div class="switch-row compact">
+        <div>
+          <strong>表情包截图识别</strong>
+          <span>没本地缓存时截屏看图；会抢一次前台，默认只对私聊开</span>
+        </div>
+        <label class="switch"><input type="checkbox" id="fStickerShot"><span></span></label>
+      </div>
+      <details class="details">
+        <summary>怎么启动桥接</summary>
+        <ol class="steps">
+          <li>先打开微信主程序（Weixin.exe）并完成登录，主窗口停在聊天列表（可以最小化到任务栏，别退出）</li>
+          <li>双击根目录的 <code>启动微信桥接.bat</code>，它会自动找微信和数据库</li>
+          <li>连上后命令行会打出账号和数据库路径；让别人发消息，就会自动回，这里状态变成「已连接」</li>
+        </ol>
+        <p class="tip">Python 和依赖已经打包在 runtime/ 里，不用另外装。桥接通过模拟操作微信窗口工作，建议用小号。</p>
+      </details>
+    </section>
+
+    <section class="sec" data-sec="imagegen">
+      <h3>生图</h3>
+      <p class="sec-note">让她学会画图：对话里说「画一张…」或到「表情」页点「生成图片」。用的是通义千问 qwen-image-3.0，需要一个 DashScope / 千问 Key；生成结果存在 <code>data/stickers/</code>，会自动按图片发到微信。</p>
+      <div class="switch-row">
+        <div>
+          <strong>启用生图</strong>
+          <span>关闭后不会调用生图接口</span>
+        </div>
+        <label class="switch"><input type="checkbox" id="fImagegen"><span></span></label>
+      </div>
+      <div class="field">
+        <label for="fImagegenKey">生图 Key</label>
+        <input id="fImagegenKey" type="password" autocomplete="off" placeholder="DashScope / 千问 API Key">
+        <span class="tip" id="imagegenKeyTip">和看图 Key 不是一回事；不填则不能生图。</span>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="fImagegenBase">接口地址</label>
+          <input id="fImagegenBase" type="text" spellcheck="false" placeholder="https://maas.qianwenaiapi.com">
+        </div>
+        <div class="field">
+          <label for="fImagegenModel">模型</label>
+          <input id="fImagegenModel" type="text" spellcheck="false" placeholder="qwen-image-3.0">
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" data-sec="voice">
+      <h3>语音识别</h3>
+      <p class="sec-note">和开源项目一样，用通义千问 <code>qwen3-asr-flash</code> 把语音转成文字；微信 4.x 的「语音转文字」是本地界面行为，数据库和 UIA 都读不到，只能走外部识别。</p>
+      <div class="switch-row">
+        <div>
+          <strong>识别语音</strong>
+          <span>关闭后收到语音只回「没听清」，不做转写</span>
+        </div>
+        <label class="switch"><input type="checkbox" id="fVoice"><span></span></label>
+      </div>
+      <label for="fVoiceKey">语音识别 Key</label>
+      <input id="fVoiceKey" type="password" autocomplete="off" placeholder="百炼 / DashScope API Key">
+      <span class="tip" id="voiceKeyTip">不填则不会转写；DeepSeek 的 Key 不能用于语音。</span>
+      <div class="field-row">
+        <div class="field">
+          <label for="fVoiceBase">接口地址</label>
+          <input id="fVoiceBase" type="text" spellcheck="false">
+        </div>
+        <div class="field">
+          <label for="fVoiceModel">模型</label>
+          <input id="fVoiceModel" type="text" spellcheck="false">
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" data-sec="memory">
+      <h3>记忆</h3>
+      <p class="sec-note">每个对话单独记。它只会在被提到的时候自然带出来。</p>
+      <div class="notes" id="noteList"></div>
+      <div class="add-note">
+        <input id="fNote" type="text" maxlength="60" placeholder="加一条记忆，比如：对花生过敏">
+        <button class="btn small" id="btnAddNote">添加</button>
+      </div>
+    </section>
+
+    <section class="sec" data-sec="data">
+      <h3>数据</h3>
+      <p class="sec-note">聊天记录、记忆都存在本机 <code>data/store.json</code>，不会上传到别处。</p>
+      <div class="inline-actions">
+        <button class="btn danger" id="btnWipe">清空全部对话</button>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="drawer-foot">
+    <p class="result" id="testResult"></p>
+    <div class="drawer-foot-actions">
+      <button class="btn primary" id="btnSave" type="button">保存</button>
+      <button class="btn" id="btnTest" type="button">测试连接</button>
+      <button class="btn ghost" id="btnClearKey" type="button">清除 Key</button>
+    </div>
+  </div>
+</aside>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="/assets/app.js"></script>
+<script src="/assets/console.js"></script>
+</body>
+</html>

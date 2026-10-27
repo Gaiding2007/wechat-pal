@@ -1,0 +1,18 @@
+{
+  "name": "wechat-pal",
+  "version": "3.3.1",
+  "private": true,
+  "description": "wechat-pal 路 寰俊鑱婂ぉ浼翠荆锛氳兘鑱婂ぉ銆佽兘鍙戝浘銆佽兘鍒锋湅鍙嬪湀鐨勫井淇?AI 鎼瓙锛岃嚜甯︾綉椤垫帶鍒跺彴鍜屽井淇?4.x 妗ユ帴",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node tests/all.test.js",
+    "test:node": "node --test tests/"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}
