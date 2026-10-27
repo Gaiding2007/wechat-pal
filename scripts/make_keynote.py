@@ -241,39 +241,31 @@ INSTALL = with_shadow(rounded_card(INSTALL_CROP, 560, radius=12))
 SCENES = [
     dict(
         key="intro",
-        voice="嗨，我是鲸鱼娘。今天想给你看一个，能住进微信里的小家伙。",
-        caption=["嗨，我是鲸鱼娘。", "今天想给你看一个，能住进微信里的小家伙。"],
-        dur=None,
+        lines=["嗨，我是鲸鱼娘。", "今天想给你看一个，能住进微信里的小家伙。"],
     ),
     dict(
         key="chat",
-        voice="她叫 wechat-pal。你把微信交给她，她就会在聊天里回你。文字、图片，都可以。",
-        caption=["她叫 wechat-pal。", "你把微信交给她，她就会在聊天里回你。文字、图片，都可以。"],
+        lines=["她叫 wechat-pal。", "你把微信交给她，她就会在聊天里回你。", "文字、图片，都可以。"],
     ),
     dict(
         key="persona",
-        voice="不只是鲸鱼娘。你可以换一套人格，改她的名字、说话方式，甚至导入你自己写的人设。",
-        caption=["不只是鲸鱼娘。", "改名字、改说话方式，或者导入你自己写的人设。"],
+        lines=["不只是鲸鱼娘。", "你可以改名字、改说话方式，", "也可以导入你自己写的人设。"],
     ),
     dict(
         key="install",
-        voice="安装很简单。下载安装包，选个文件夹，双击，就好了。",
-        caption=["安装很简单。", "下载安装包，选个文件夹，双击，就好了。"],
+        lines=["安装很简单。", "下载安装包，选个文件夹，双击，就好了。"],
     ),
     dict(
         key="moments",
-        voice="朋友圈、图片、语音、文件，她都能看见。你不在的时候，她也有自己的小生活。",
-        caption=["朋友圈、图片、语音、文件，她都能看见。", "你不在的时候，她也有自己的小生活。"],
+        lines=["朋友圈、图片、语音、文件，她都能看见。", "你不在的时候，她也有自己的小生活。"],
     ),
     dict(
         key="life",
-        voice="她不是那种只会说早安的机器人。你可以教她说话，也可以，慢慢养大她。",
-        caption=["她不是只会说早安的机器人。", "你可以教她说话，也可以，慢慢养大她。"],
+        lines=["她不是那种只会说早安的机器人。", "你可以教她说话，也可以，慢慢养大她。"],
     ),
     dict(
         key="end",
-        voice="wechat-pal。把鲸鱼娘，养进微信。也可以换成，你自己的那个人。GitHub 搜 Gaiding2007。",
-        caption=["把鲸鱼娘，养进微信。", "也可以换成，你自己的那个人。"],
+        lines=["wechat-pal。", "把鲸鱼娘，养进微信。", "也可以换成，你自己的那个人。"],
     ),
 ]
 
@@ -281,23 +273,46 @@ import asyncio
 import edge_tts
 
 
-async def tts(text: str, path: Path):
+async def tts_line(text: str, path: Path):
     com = edge_tts.Communicate(text, "zh-CN-XiaoyiNeural", rate="+6%", pitch="+6Hz")
     await com.save(str(path))
 
 
+def _wav_frames(path: Path):
+    with wave.open(str(path), "rb") as w:
+        return w.readframes(w.getnframes()), w.getframerate(), w.getnchannels(), w.getsampwidth()
+
+
 def prep_audio():
     for i, s in enumerate(SCENES):
-        mp3 = OUT / f"voice_{i}.mp3"
-        wav = OUT / f"voice_{i}.wav"
-        if not mp3.exists() or mp3.stat().st_size < 1000:
-            asyncio.run(tts(s["voice"], mp3))
-        subprocess.run([str(FFMPEG), "-y", "-i", str(mp3), "-ar", "44100", "-ac", "2", str(wav)],
-                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
-        with wave.open(str(wav), "rb") as w:
-            dur = w.getnframes() / w.getframerate()
-        s["audio"] = wav
-        s["dur"] = max(4.6, dur + 1.25)
+        pieces = []
+        starts = []
+        total = 0
+        for j, line in enumerate(s["lines"]):
+            mp3 = OUT / f"voice_{i}_{j}.mp3"
+            wav = OUT / f"voice_{i}_{j}.wav"
+            if not mp3.exists() or mp3.stat().st_size < 1000:
+                asyncio.run(tts_line(line, mp3))
+            subprocess.run([str(FFMPEG), "-y", "-i", str(mp3), "-ar", "44100", "-ac", "2", str(wav)],
+                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+            frames, rate, ch, sw = _wav_frames(wav)
+            dur = len(frames) / (rate * ch * sw)
+            starts.append({"text": line, "start": total, "end": total + dur})
+            pieces.append((frames, dur))
+            total += dur + 0.18
+        # 拼接：每条之间留 0.18 秒，句尾留 0.2 秒
+        gap = b"\x00" * int(44100 * 0.18) * 2 * 2
+        tail = b"\x00" * int(44100 * 0.20) * 2 * 2
+        merged = b"".join(f + gap for f, _ in pieces) + tail
+        voice_wav = OUT / f"voice_{i}.wav"
+        with wave.open(str(voice_wav), "wb") as w:
+            w.setnchannels(2)
+            w.setsampwidth(2)
+            w.setframerate(44100)
+            w.writeframes(merged)
+        s["audio"] = voice_wav
+        s["lines_time"] = starts
+        s["dur"] = max(4.6, total + 0.20 + 1.15)
     return sum(s["dur"] for s in SCENES)
 
 
@@ -500,14 +515,10 @@ def write_srt(starts):
     idx = 1
     lines = []
     for s, st in zip(SCENES, starts):
-        caps = s["caption"]
-        total = sum(len(c) for c in caps)
-        cur = st + 0.25
-        for c in caps:
-            dur = max(1.2, (s["dur"] - 0.4) * len(c) / total)
-            lines += [str(idx), f"{ts(cur)} --> {ts(cur + dur)}", c, ""]
+        for item in s["lines_time"]:
+            cur = st + 0.25 + item["start"]
+            lines += [str(idx), f"{ts(cur)} --> {ts(cur + item['end'] - item['start'] + 0.18)}", item["text"], ""]
             idx += 1
-            cur += dur
     (OUT / "wechat-pal.srt").write_text("\n".join(lines), encoding="utf-8")
 
 
@@ -536,8 +547,17 @@ def main():
             im = STAGE.copy()
             fn = SCENE_FN[s["key"]]
             fn(im, p, st + p * s["dur"])
-            cap = s["caption"][0] if p < 0.52 else s["caption"][-1]
-            caption(im, cap, fade(p, 0.06, 0.2))
+            local = p * s["dur"] - 0.25
+            cap = s["lines_time"][0]
+            for item in s["lines_time"]:
+                if local >= item["start"] - 0.05:
+                    cap = item
+            a = 1.0
+            if local < cap["start"] - 0.05:
+                a = fade(local, cap["start"] - 0.22, cap["start"] - 0.05)
+            elif local > cap["end"] - 0.02:
+                a = 1.0 - fade(local, cap["end"] - 0.02, cap["end"] + 0.22)
+            caption(im, cap["text"], max(0.0, min(1.0, a)))
             proc.stdin.write(im.convert("RGB").tobytes())
         print(f"{s['key']}: {s['dur']:.1f}s", flush=True)
     proc.stdin.close()

@@ -1,9 +1,10 @@
+﻿# wechat-pal · WeChat Companion
+
 <p align="center">
   <a href="./README.md">简体中文</a> ·
   <a href="./README.en.md"><b>English</b></a>
 </p>
 
-# wechat-pal · WeChat Companion
 
 A **persona-swappable AI companion for WeChat**, and a console that can actually operate your WeChat. Chat in the browser, or connect it to your own WeChat account. Beyond text, it reads real chats, images, voice messages and files, browses Moments, likes and comments, manages a sticker library, and keeps a small "life" state of its own.
 
@@ -336,3 +337,5 @@ Use `/persona` and adjust style preset, opinions and extra rules. Program-level 
 ## License
 
 MIT. Persona text is freely editable; Whale Girl is fan art inspired by community reinterpretations, and the character rights belong to the original creators.
+
+
