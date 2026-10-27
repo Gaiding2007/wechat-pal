@@ -1,4 +1,9 @@
-﻿# wechat-pal · 微信聊天伴侣
+﻿<p align="center">
+  <a href="./README.md"><b>简体中文</b></a> ·
+  <a href="./README.en.md">English</a>
+</p>
+
+# wechat-pal · 微信聊天伴侣
 
 一个**可以换人格**的微信 AI 搭子，也是一套能直接操作你微信的控制台。网页里可以直接聊，也可以接到自己的微信上；除了文字，还能看微信里的真实会话、图片、语音和文件，浏览朋友圈、点赞评论，管理表情库，以及看她自己的「生活」状态。
 
@@ -14,7 +19,7 @@
 - **真正的安装包**：`wechat-pal-setup-3.3.1.exe`，双击安装，可自定义目录，装完桌面有快捷方式。不再需要解压 zip。
 - **角色立绘 / 自拍**：鲸鱼娘有了正式形象（`assets/persona/whale-girl.png`，蓝发鲸尾女仆装）。在聊天里说「发张自拍」「看看你长什么样」，她会发这张图，而不是随便生成一个陌生人。人设页可维护多张 `selfies`。
 - **表情包识别**：不再只靠表情名。会先截图聊天区做视觉识别；动图按 2fps 抽 3 帧逐帧描述再合并。识别结果缓存在 `data/sticker-desc.json`，第二次 0 秒。认不出时会诚实说「没看清」，不瞎编。
-- **介绍视频**：`dist/wechat-pal-intro.mp4`，54 秒，鲸鱼娘主题，配音换成自然的 Edge TTS（晓伊），不再用系统机械音。封面 `dist/bilibili-cover.png`，投稿文案 `dist/bilibili.txt`。
+- **介绍视频**：`dist/wechat-pal-intro.mp4`，约 55 秒，参考 lemo-opuscar 的 Dark Tech Keynote 风格（暗色舞台、荧光绿强调、UI 当主角），Edge TTS 晓伊配音，字幕跟旁白。封面 `dist/bilibili-cover.png`，投稿文案 `dist/bilibili.txt`，分镜见 `docs/B站视频故事板.md`。
 - **图片发送**：确认过了，桥接本来就是「把文件放进剪贴板 → 在输入框 Ctrl+V → 发送」，不经过桌面。之前看到的路径只是临时文件。
 - **语音**：保持 3.2 的结论——微信内置转文字没有可编程入口；开源项目也是外部 DashScope ASR。设置里可填 Key，不填就回「没听清」。
 
@@ -147,7 +152,7 @@ Key 只保存在本机 `data/settings.json`，不会上传到别处。设置页�
 
 桥接和网页服务之间的令牌在 `config.json` 的 `gateway.wechat.inboundToken`，默认 `change-me-wechat`。设置页「微信」分区能看到当前令牌，也可以复制。只监听 `127.0.0.1`，外网访问不到。
 
-桥接日志在 `data/wechat-bridge-4x.log`。如果一直连不上，双击 `一键修复并自检.bat`，它会逐项检查运行时、依赖、微信进程、数据库路径、服务端口和令牌，不会发送任何消息。
+桥接日志在 `data/wechat-bridge-4x.log`，里面会打印配置路径、数据库目录、账号和每一条失败原因。如果一直连不上，先看日志最后 20 行；设置页「微信」分区也会显示在线状态和最近心跳。
 
 桥接连上后会额外开一个本机能力接口 `127.0.0.1:8791`（只监听本机，令牌和 webhook 一致），网页的「微信消息 / 朋友圈 / 表情」都通过它读数据。端口可以在 `config.json` 的 `bridge.rpcPort` 改。
 
@@ -202,7 +207,6 @@ Key 只保存在本机 `data/settings.json`，不会上传到别处。设置页�
 | `启动微信桥接.bat` | 启动微信桥接；会自动找微信、缺服务时自动拉起服务 |
 | `重启微信聊天伴侣.bat` | 先停旧进程再启动 |
 | `一键终止.bat` | 停止服务、桥接和热键 |
-| `一键修复并自检.bat` | 只检查不发送：运行时、依赖、微信、数据库、端口、令牌 |
 | `打开配置目录.bat` | 在资源管理器里定位 `config.json`，方便填微信数据库路径 |
 | `修复权限.bat` | 从沙箱/工作区复制出来后，把文件夹恢复成普通完整性（解决「未找到 Weixin.dll / 拒绝访问」） |
 | `编辑人设.bat` | 打开 `/persona` 人设配置页 |
@@ -245,7 +249,7 @@ Key 只保存在本机 `data/settings.json`，不会上传到别处。设置页�
 
 ```
 wechat-pal/
-├─ 启动微信聊天伴侣.bat     # 以及桥接/自检/终止/人设/调试等 bat
+├─ 启动微信聊天伴侣.bat     # 以及桥接/终止/人设/调试等 bat
 ├─ server.js                # 零依赖 HTTP 服务：网页、API、微信 webhook、控制台数据
 ├─ src/
 │  ├─ persona.js            # 人设模型、系统提示词、清洗、分条、群聊判断
@@ -262,7 +266,7 @@ wechat-pal/
 │  ├─ care.js / demo.js / config.js / store.js / logger.js
 ├─ personas/                # whale-girl.json / tieba.json 预设
 ├─ web/                     # index.html（控制台）、console.js、persona.html、debug.html
-├─ bridge/                  # 微信 4.x 桥接 + pal_rpc.py 能力接口 + 自检
+├─ bridge/                  # 微信 4.x 桥接 + pal_rpc.py 能力接口
 ├─ runtime/                 # 包内 Node + Python，解压即用
 ├─ tools/hotkey_daemon.py
 ├─ scripts/                 # 启停、重置、截图、示例表情生成
@@ -368,4 +372,5 @@ node server.js  # 端口 8787
 ## 许可
 
 MIT。人设文本可自由修改；鲸鱼娘是同人二创，相关角色版权归原作者。
+
 
