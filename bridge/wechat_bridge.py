@@ -769,7 +769,38 @@ def main():
         boot("开始 import wechatauto（可能较慢，10~20 秒）")
         from wechatauto import MediaDownloader, WeChatDB, WeChatGUI
         from wechatauto.db import Listener
+
+        # 不抢用户的桌面：以前 WeChatGUI.ensure_visible() 会把挡住微信的窗口
+        # 全部最小化，发一条消息整个屏幕都会跳一下。这里直接关掉这个行为，
+        # 只把微信主窗置前；剩下的窗口保持原样。
+        try:
+            from wechatauto import guia as _wa_gui
+            if not getattr(_wa_gui.WeChatGUI, "_pal_no_minimize", False):
+                _wa_gui.WeChatGUI._minimize_blockers = lambda self: 0
+                _wa_gui.WeChatGUI._pal_no_minimize = True
+            boot("桌面保护：已关闭「自动最小化其他窗口」")
+        except Exception as _e:                     # noqa: BLE001
+            boot("桌面保护补丁未生效：%s" % _e)
+
+        # UIA 预热会先拿几个辅助进程的窗口试写，失败是正常的中间步骤；
+        # 之前每个候选都打一条 WARNING，用户以为桥接坏了。这里只保留真正
+        # 全部失败时的提示，中间探测降到 debug。
+        try:
+            from wechatauto import accessibility as _wa_acc
+            _orig_acc_warn = _wa_acc.wxlog.warning
+
+            def _quiet_uia_warn(msg, *args, **kwargs):
+                text = str(msg)
+                if text.startswith("热激活 UIA 失败："):
+                    return _wa_acc.wxlog.debug(text, *args, **kwargs)
+                return _orig_acc_warn(msg, *args, **kwargs)
+
+            _wa_acc.wxlog.warning = _quiet_uia_warn
+        except Exception as _e:                     # noqa: BLE001
+            boot("UIA 日志收敛补丁未生效：%s" % _e)
+
         # 微信 4.x 在部分机器上不会出现在 psutil / tasklist 的进程列表里，
+
         # 但窗口在；给 WeChatDB 补一个按窗口反查 PID 的兜底。
         boot("WeChatDB 进程查找：%s" % ("已加窗口兜底" if patch_wechatdb_process_lookup() else "补丁未生效"))
 

@@ -1,8 +1,8 @@
 {
   "name": "wechat-pal",
-  "version": "3.3.1",
+  "version": "3.3.2",
   "private": true,
-  "description": "wechat-pal 路 寰俊鑱婂ぉ浼翠荆锛氳兘鑱婂ぉ銆佽兘鍙戝浘銆佽兘鍒锋湅鍙嬪湀鐨勫井淇?AI 鎼瓙锛岃嚜甯︾綉椤垫帶鍒跺彴鍜屽井淇?4.x 妗ユ帴",
+  "description": "wechat-pal · 微信聊天伴侣：能聊天、能发图、能刷朋友圈的微信 AI 搭子，自带网页控制台和微信 4.x 桥接",
   "type": "commonjs",
   "main": "server.js",
   "scripts": {

@@ -1,4 +1,4 @@
-﻿# wechat-pal · 微信聊天伴侣
+# wechat-pal · 微信聊天伴侣
 
 <p align="center">
   <a href="./README.md"><b>简体中文</b></a> ·
@@ -17,7 +17,7 @@
 
 ## 3.3 更新
 
-- **真正的安装包**：`wechat-pal-setup-3.3.1.exe`，双击安装，可自定义目录，装完桌面有快捷方式。不再需要解压 zip。
+- **真正的安装包**：`wechat-pal-setup-3.3.2.exe`，双击安装，可自定义目录，装完桌面有快捷方式。不再需要解压 zip。
 - **角色立绘 / 自拍**：鲸鱼娘重新做了全身立绘（透明底，`assets/persona/whale-girl.png`）和 Q 版形象（`assets/persona/whale-girl-chibi-cutout.png`），网页图标、安装包图标、封面统一。在聊天里说「发张自拍」「看看你长什么样」，她会发自己的图，而不是随便生成一个陌生人。人设页可维护多张 `selfies`。
 - **表情包识别**：不再只靠表情名。会先截图聊天区做视觉识别；动图按 2fps 抽 3 帧逐帧描述再合并。识别结果缓存在 `data/sticker-desc.json`，第二次 0 秒。认不出时会诚实说「没看清」，不瞎编。
 - **介绍视频**：`dist/wechat-pal-intro.mp4`，约 66 秒，lemo-opuscar 的 Dark Tech Keynote 风格（暗色舞台、荧光绿强调、UI 当主角），Edge TTS 晓伊配音，字幕跟旁白；人声出现时 BGM 自动压低。新增「自定义人格」和「微信里回文字/图片」演示。封面 `dist/bilibili-cover.png`，投稿文案 `dist/bilibili.txt`，分镜见 `docs/B站视频故事板.md`。
@@ -52,7 +52,7 @@
 
 ## 快速开始
 
-从 [GitHub Releases](https://github.com/Gaiding2007/wechat-pal/releases) 下载 **`wechat-pal-setup-3.3.1.exe`**，双击安装（可以改安装目录），装完桌面会有「微信聊天伴侣」快捷方式。也可以直接双击 **`启动微信聊天伴侣.bat`**，浏览器会自动打开 <http://127.0.0.1:8787>。包内自带 Node，不需要另装。
+从 [GitHub Releases](https://github.com/Gaiding2007/wechat-pal/releases) 下载 **`wechat-pal-setup-3.3.2.exe`**，双击安装（可以改安装目录），装完桌面会有「微信聊天伴侣」快捷方式。也可以直接双击 **`启动微信聊天伴侣.bat`**，浏览器会自动打开 <http://127.0.0.1:8787>。包内自带 Node，不需要另装。
 
 也可以手动启动：
 
