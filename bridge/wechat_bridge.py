@@ -2342,6 +2342,11 @@ def main():
                 return
             mtype = msg.get("type") or ""
             content = (msg.get("content") or "").strip()
+            sender = msg.get("sender_username") or ""
+            # 自己发的消息（包括桥接刚发出去的自拍/图片）不要再当成人家的消息处理，
+            # 否则会出现「刚发完图，又去读自己发的图，然后说看图失败」。
+            if sender == me or msg.get("is_self"):
+                return
             if mtype == "图片":
                 desc = describe_image(msg)
                 if not desc:
@@ -2386,9 +2391,6 @@ def main():
                 content = (msg.get("content") or "").strip()
             if not content or content.startswith("<"):
                 return
-            sender = msg.get("sender_username") or ""
-            if sender == me:
-                return  # 自己发的
             create_time = float(msg.get("create_time") or 0)
             if create_time and create_time < START_TS - SKIP_OLDER_THAN:
                 return

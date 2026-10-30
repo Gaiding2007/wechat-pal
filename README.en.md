@@ -15,9 +15,9 @@ The package name is `wechat-pal`; the Chinese display name is 「微信聊天伴
 
 > Whale Girl is a fan character inspired by community reinterpretations on Bilibili, not an official character. The Tieba preset borrows the structure of early open-source persona prompts, with profanity and personal attacks removed.
 
-## What's new in 3.3.2
+## What's new in 3.3.3
 
-- **Real Windows installer** — `wechat-pal-setup-3.3.2.exe`; double-click, choose a folder, get a desktop shortcut. No zip extraction.
+- **Real Windows installer** — `wechat-pal-setup-3.3.3.exe`; double-click, choose a folder, get a desktop shortcut. No zip extraction.
 - **Official character art & selfies** — Whale Girl now has a reference-matched design (`assets/persona/whale-girl.png`). Say "send a selfie" in chat and she sends that image, not a random stranger. The persona page supports multiple `selfies`.
 - **Sticker recognition** — screenshots the chat area for vision instead of trusting sticker names; animated GIFs are sampled at 2 fps into 3 frames and described together. Results cache in `data/sticker-desc.json` (0 s on repeat). If unsure, she says she can't see it — no invented descriptions.
 - **Intro video** — `dist/wechat-pal-intro.mp4`, 54 s, Whale Girl themed, natural Edge TTS narration (Xiaoyi) instead of a system voice. Cover: `dist/bilibili-cover.png`; upload copy: `dist/bilibili.txt`.
@@ -43,7 +43,7 @@ Other console pages: WeChat messages, Moments, stickers, life.
 
 ## Quick start
 
-Download **`wechat-pal-setup-3.3.2.exe`** from [GitHub Releases](https://github.com/Gaiding2007/wechat-pal/releases), double-click, choose a folder, and launch from the desktop shortcut. You can also run **`启动微信聊天伴侣.bat`** directly; the browser opens <http://127.0.0.1:8787>. Node is bundled.
+Download **`wechat-pal-setup-3.3.3.exe`** from [GitHub Releases](https://github.com/Gaiding2007/wechat-pal/releases), double-click, choose a folder, and launch from the desktop shortcut. You can also run **`启动微信聊天伴侣.bat`** directly; the browser opens <http://127.0.0.1:8787>. Node is bundled.
 
 Manual start:
 

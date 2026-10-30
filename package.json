@@ -1,6 +1,6 @@
 {
   "name": "wechat-pal",
-  "version": "3.3.2",
+  "version": "3.3.3",
   "private": true,
   "description": "wechat-pal · 微信聊天伴侣：能聊天、能发图、能刷朋友圈的微信 AI 搭子，自带网页控制台和微信 4.x 桥接",
   "type": "commonjs",

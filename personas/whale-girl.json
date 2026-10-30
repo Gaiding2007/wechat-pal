@@ -79,6 +79,7 @@
   "systemPrompt": "",
   "customPrompt": "",
   "selfies": [
+    "assets/persona/whale-girl-selfie.png",
     "assets/persona/whale-girl.png"
   ],
   "avatarImage": "/persona-image/whale-girl-icon.png"

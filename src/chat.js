@@ -227,17 +227,21 @@ class Companion {
       hidden: /^（对方/.test(text) || /^（系统/.test(text),
     });
 
-    // 「发张自拍」直接发人设自拍图，不让模型凭空生成别人的脸
-    const selfieRe = /(?:发|来|给|看).{0,6}(?:自拍|照片|自画像)|你的(?:自拍|照片|样子)|看看你|长什么样/;
+    // 「发张自拍 / 拍张照片看看」直接发人设自拍图；「立绘/全身」才发全身图。
+    // 这一步永远不调用生图 API，避免把「看看你」理解成「新画一个人」。
+    const selfieRe = /(?:发|来|给|看|拍|照).{0,8}(?:自拍|照片|自画像|照)|你的(?:自拍|照片|样子)|看看你|长什么样|拍张照片/;
     if (selfieRe.test(text) && !(isGroup && !input.atMe)) {
       const root = (this.config.paths && this.config.paths.root) || process.cwd();
       const list = (persona.selfies || [])
         .map((p) => (path.isAbsolute(p) ? p : path.join(root, p)))
         .filter((p) => fs.existsSync(p));
       if (list.length) {
-        const file = list[0];
+        const fullBody = /立绘|全身|全身照|整身/.test(text)
+          ? list.find((p) => /whale-girl\.png$/i.test(p))
+          : null;
+        const file = fullBody || list[0];
         const name = path.basename(file);
-        const said = '喏，我长这样。别盯着看太久啊。';
+        const said = fullBody ? '这是全身的立绘。' : '喏，刚拍的。别盯着看太久啊。';
         this.store.addMessage(session.id, {
           role: 'assistant',
           text: said,
